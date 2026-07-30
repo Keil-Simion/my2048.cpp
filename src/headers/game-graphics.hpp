@@ -1,14 +1,13 @@
-#ifndef GAMEGRAPHICS_H
-#define GAMEGRAPHICS_H
+#pragma once
 
 #include <string>
 #include <tuple>
 
-enum GameBoardDimensions {
+enum class GameBoardDimensions {
   MIN_GAME_BOARD_PLAY_SIZE = 3,
   MAX_GAME_BOARD_PLAY_SIZE = 10
 };
-enum { COMPETITION_GAME_BOARD_PLAY_SIZE = 4 };
+constexpr int COMPETITION_GAME_BOARD_PLAY_SIZE = 4;
 
 namespace Game {
 namespace Graphics {
@@ -35,5 +34,3 @@ using input_controls_display_data_t = std::tuple<bool, bool>;
 std::string GameInputControlsOverlay(input_controls_display_data_t gamestatus);
 } // namespace Graphics
 } // namespace Game
-
-#endif

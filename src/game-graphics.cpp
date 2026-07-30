@@ -106,9 +106,9 @@ std::string BoardSizeErrorPrompt() {
   constexpr auto sp = "  ";
   std::ostringstream error_prompt_richtext;
   error_prompt_richtext << red << sp << std::begin(invalid_prompt_text)[0]
-                        << MIN_GAME_BOARD_PLAY_SIZE
+                        << static_cast<int>(GameBoardDimensions::MIN_GAME_BOARD_PLAY_SIZE)
                         << std::begin(invalid_prompt_text)[1]
-                        << MAX_GAME_BOARD_PLAY_SIZE
+                        << static_cast<int>(GameBoardDimensions::MAX_GAME_BOARD_PLAY_SIZE)
                         << std::begin(invalid_prompt_text)[2] << def << "\n\n";
   return error_prompt_richtext.str();
 }
