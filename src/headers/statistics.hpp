@@ -1,5 +1,4 @@
-#ifndef STATISTICS_H
-#define STATISTICS_H
+#pragma once
 
 #include "global.hpp"
 #include <iosfwd>
@@ -30,5 +29,3 @@ void CreateFinalScoreAndEndGameDataFile(std::ostream &os, std::istream &is,
 
 std::istream &operator>>(std::istream &is, Statistics::total_game_stats_t &s);
 std::ostream &operator<<(std::ostream &os, Statistics::total_game_stats_t &s);
-
-#endif

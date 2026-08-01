@@ -1,5 +1,4 @@
-#ifndef SCORES_H
-#define SCORES_H
+#pragma once
 
 #include "global.hpp"
 #include <iosfwd>
@@ -30,5 +29,3 @@ void saveScore(Score finalscore);
 
 std::istream &operator>>(std::istream &is, Scoreboard::Score &s);
 std::ostream &operator<<(std::ostream &os, Scoreboard::Score &s);
-
-#endif

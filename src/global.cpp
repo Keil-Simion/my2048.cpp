@@ -1,12 +1,18 @@
 #include "global.hpp"
 #include "color.hpp"
+#include <format>
 #include <iostream>
 #include <sstream>
 
 #ifdef _WIN32
+#  include <conio.h>
 
+// Read one raw byte from the console without buffering or translation.
+// `std::cin >> c` on Windows is line-buffered and skips whitespace, which
+// makes it unreliable for reading non-ASCII bytes like the 0xE0 prefix that
+// Windows uses for arrow keys / function keys.
 void getKeypressDownInput(char &c) {
-  std::cin >> c;
+  c = static_cast<char>(_getch());
 }
 
 #else
@@ -58,19 +64,17 @@ void clearScreen() {
 };
 
 std::string secondsFormat(double sec) {
-  double s = sec;
-  int m = s / 60;
-  s -= m * 60;
-  int h = m / 60;
-  m %= 60;
-  s = (int)s;
-  std::ostringstream oss;
+  const int total = static_cast<int>(sec);
+  const int h = total / 3600;
+  const int m = (total / 60) % 60;
+  const int s = total % 60;
+  std::string result;
   if (h) {
-    oss << h << "h ";
+    result += std::format("{}h ", h);
   }
   if (m) {
-    oss << m << "m ";
+    result += std::format("{}m ", m);
   }
-  oss << s << "s";
-  return oss.str();
+  result += std::format("{}s", s);
+  return result;
 }

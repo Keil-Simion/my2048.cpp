@@ -1,5 +1,4 @@
-#ifndef LOADRESOURCE_H
-#define LOADRESOURCE_H
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -18,5 +17,3 @@ bool load_game(std::string filename, GameBoard& gb);
 
 } // namespace Loader
 } // namespace Game
-
-#endif

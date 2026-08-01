@@ -1,5 +1,4 @@
-#ifndef STATISTICSGRAPHICS_H
-#define STATISTICSGRAPHICS_H
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -15,5 +14,3 @@ using total_stats_display_data_t =
 std::string TotalStatisticsOverlay(total_stats_display_data_t tsdd);
 } // namespace Graphics
 } // namespace Statistics
-
-#endif

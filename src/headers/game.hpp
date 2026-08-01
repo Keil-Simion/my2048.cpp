@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include <string>
 
@@ -14,5 +13,3 @@ void continueGame(const std::string& filename);
 void removeTiles(GameBoard& gb);
 
 }; // namespace Game
-
-#endif

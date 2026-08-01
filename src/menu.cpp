@@ -122,11 +122,8 @@ void continueGame()
 Scoreboard::Graphics::scoreboard_display_data_list_t
 make_scoreboard_display_data_list() {
   using namespace Scoreboard::Graphics;
-  auto scoreList = Scoreboard::Scoreboard_t{};
-  // bool loaded_scorelist;
   // Warning: Does not care if file exists or not!
-  std::tie(std::ignore, scoreList) =
-      Scoreboard::loadFromFileScore("../data/scores.txt");
+  auto [_, scoreList] = Scoreboard::loadFromFileScore("../data/scores.txt");
 
   auto counter{1};
   const auto convert_to_display_list_t = [&counter](const Scoreboard::Score s) {
@@ -147,16 +144,13 @@ make_scoreboard_display_data_list() {
 
 Statistics::Graphics::total_stats_display_data_t
 make_total_stats_display_data() {
-  Statistics::total_game_stats_t stats;
-  bool stats_file_loaded{};
-  std::tie(stats_file_loaded, stats) =
+  auto [stats_file_loaded, stats] =
       Statistics::loadFromFileStatistics("../data/statistics.txt");
 
-  const auto tsdd = std::make_tuple(
+  return std::make_tuple(
       stats_file_loaded, std::to_string(stats.bestScore),
       std::to_string(stats.gameCount), std::to_string(stats.winCount),
       std::to_string(stats.totalMoveCount), secondsFormat(stats.totalDuration));
-  return tsdd;
 };
 
 void showScores() {

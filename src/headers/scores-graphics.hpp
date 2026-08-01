@@ -1,5 +1,4 @@
-#ifndef SCORESGRAPHICS_H
-#define SCORESGRAPHICS_H
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -19,5 +18,3 @@ using finalscore_display_data_t =
 std::string EndGameStatisticsPrompt(finalscore_display_data_t finalscore);
 } // namespace Graphics
 } // namespace Scoreboard
-
-#endif

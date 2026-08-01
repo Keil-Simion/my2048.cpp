@@ -1,5 +1,4 @@
-#ifndef GAMEBOARDGRAPHICS_H
-#define GAMEBOARDGRAPHICS_H
+#pragma once
 
 #include <string>
 
@@ -12,5 +11,3 @@ std::string GameBoardTextOutput(GameBoard gb);
 }
 } // namespace Gameboard
 } // namespace Game
-
-#endif

@@ -18,39 +18,29 @@ std::string receive_input_player_name(std::istream &is) {
   return name;
 }
 
-total_game_stats_t generateStatsFromInputData(std::istream &is) {
-  total_game_stats_t stats;
-  is >> stats;
-  return stats;
-}
-
-bool generateFilefromStatsData(std::ostream &os, total_game_stats_t stats) {
-  os << stats;
-  return true;
-}
-
 bool saveToFileEndGameStatistics(std::string filename, total_game_stats_t s) {
   std::ofstream filedata(filename);
-  return generateFilefromStatsData(filedata, s);
+  filedata << s;
+  return static_cast<bool>(filedata);
 }
 
 Scoreboard::Graphics::finalscore_display_data_t
 make_finalscore_display_data(Scoreboard::Score finalscore) {
-  const auto fsdd = std::make_tuple(
+  return {
       std::to_string(finalscore.score), std::to_string(finalscore.largestTile),
-      std::to_string(finalscore.moveCount), secondsFormat(finalscore.duration));
-  return fsdd;
+      std::to_string(finalscore.moveCount), secondsFormat(finalscore.duration)};
 };
 
 } // namespace
 
 load_stats_status_t loadFromFileStatistics(std::string filename) {
   std::ifstream statistics(filename);
-  if (statistics) {
-    total_game_stats_t stats = generateStatsFromInputData(statistics);
-    return load_stats_status_t{true, stats};
+  if (!statistics) {
+    return {false, {}};
   }
-  return load_stats_status_t{false, total_game_stats_t{}};
+  total_game_stats_t stats;
+  statistics >> stats;
+  return {true, stats};
 }
 
 ull load_game_best_score() {
@@ -60,15 +50,10 @@ ull load_game_best_score() {
 }
 
 void saveEndGameStats(Scoreboard::Score finalscore) {
-  total_game_stats_t stats;
-  // Need some sort of stats data values only.
-  // No need to care if file loaded successfully or not...
-  std::tie(std::ignore, stats) =
-      loadFromFileStatistics("../data/statistics.txt");
-  stats.bestScore =
-      stats.bestScore < finalscore.score ? finalscore.score : stats.bestScore;
+  auto [_, stats] = loadFromFileStatistics("../data/statistics.txt");
+  stats.bestScore = std::max(stats.bestScore, finalscore.score);
   stats.gameCount++;
-  stats.winCount = finalscore.win ? stats.winCount + 1 : stats.winCount;
+  stats.winCount += finalscore.win;
   stats.totalMoveCount += finalscore.moveCount;
   stats.totalDuration += finalscore.duration;
 
@@ -82,8 +67,7 @@ void CreateFinalScoreAndEndGameDataFile(std::ostream &os, std::istream &is,
                                 Scoreboard::Graphics::EndGameStatisticsPrompt));
 
   DrawAlways(os, Graphics::AskForPlayerNamePrompt);
-  const auto name = receive_input_player_name(is);
-  finalscore.name = name;
+  finalscore.name = receive_input_player_name(is);
 
   Scoreboard::saveScore(finalscore);
   saveEndGameStats(finalscore);

@@ -1,5 +1,4 @@
-#ifndef SAVERESOURCE_H
-#define SAVERESOURCE_H
+#pragma once
 
 #include <string>
 #include <tuple>
@@ -12,5 +11,3 @@ void saveGamePlayState(GameBoard gb, const std::string& filename);
 
 } // namespace Saver
 } // namespace Game
-
-#endif

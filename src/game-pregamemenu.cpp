@@ -157,9 +157,7 @@ load_gameboard_status_t initialiseContinueBoardArray(const std::string& filename
  * @param filename The name of the file from which to load the previous game state.
  */
 void DoContinueOldGame(const std::string& filename) {
-  bool load_old_game_ok;
-  GameBoard oldGameBoard;
-  std::tie(load_old_game_ok, oldGameBoard) = initialiseContinueBoardArray(filename);
+  auto [load_old_game_ok, oldGameBoard] = initialiseContinueBoardArray(filename);
   if (load_old_game_ok) {
     playGame(PlayGameFlag::ContinuePreviousGame, oldGameBoard);
   } else {

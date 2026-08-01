@@ -1,5 +1,4 @@
-#ifndef GAMEBOARD_H
-#define GAMEBOARD_H
+#pragma once
 
 #include "tile.hpp"
 #include <tuple>
@@ -45,5 +44,3 @@ void tumbleTilesRightOnGameboard(GameBoard &gb);
 std::string printStateOfGameBoard(GameBoard gb);
 
 } // namespace Game
-
-#endif

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <format>
 #include <ostream>
 
 namespace Color {
+
 enum class Code {
   BOLD = 1,
   RESET = 0,
@@ -30,32 +32,49 @@ enum class Code {
 };
 
 class Modifier {
-
   Code code;
 
 public:
-  Modifier(Code pCode) : code(pCode) {}
+  constexpr Modifier(Code pCode) : code(pCode) {}
+  constexpr Code value() const { return code; }
+
   friend std::ostream &operator<<(std::ostream &os, const Modifier &mod) {
     return os << "\033[" << static_cast<int>(mod.code) << "m";
   }
 };
 
+// An inline namespace: members are accessible as `Color::bold_on` AND via
+// unqualified lookup in any enclosing namespace (including the global one).
+inline namespace Modifiers {
+inline constexpr Modifier bold_off{Code::RESET};
+inline constexpr Modifier bold_on{Code::BOLD};
+inline constexpr Modifier def{Code::FG_DEFAULT};
+inline constexpr Modifier red{Code::FG_RED};
+inline constexpr Modifier green{Code::FG_GREEN};
+inline constexpr Modifier yellow{Code::FG_YELLOW};
+inline constexpr Modifier blue{Code::FG_BLUE};
+inline constexpr Modifier magenta{Code::FG_MAGENTA};
+inline constexpr Modifier cyan{Code::FG_CYAN};
+inline constexpr Modifier lightGray{Code::FG_LIGHT_GRAY};
+inline constexpr Modifier darkGray{Code::FG_DARK_GRAY};
+inline constexpr Modifier lightRed{Code::FG_LIGHT_RED};
+inline constexpr Modifier lightGreen{Code::FG_LIGHT_GREEN};
+inline constexpr Modifier lightYellow{Code::FG_LIGHT_YELLOW};
+inline constexpr Modifier lightBlue{Code::FG_LIGHT_BLUE};
+inline constexpr Modifier lightMagenta{Code::FG_LIGHT_MAGENTA};
+inline constexpr Modifier lightCyan{Code::FG_LIGHT_CYAN};
+} // namespace Modifiers
+
 } // namespace Color
 
-static Color::Modifier bold_off(Color::Code::RESET);
-static Color::Modifier bold_on(Color::Code::BOLD);
-static Color::Modifier def(Color::Code::FG_DEFAULT);
-static Color::Modifier red(Color::Code::FG_RED);
-static Color::Modifier green(Color::Code::FG_GREEN);
-static Color::Modifier yellow(Color::Code::FG_YELLOW);
-static Color::Modifier blue(Color::Code::FG_BLUE);
-static Color::Modifier magenta(Color::Code::FG_MAGENTA);
-static Color::Modifier cyan(Color::Code::FG_CYAN);
-static Color::Modifier lightGray(Color::Code::FG_LIGHT_GRAY);
-static Color::Modifier darkGray(Color::Code::FG_DARK_GRAY);
-static Color::Modifier lightRed(Color::Code::FG_LIGHT_RED);
-static Color::Modifier lightGreen(Color::Code::FG_LIGHT_GREEN);
-static Color::Modifier lightYellow(Color::Code::FG_LIGHT_YELLOW);
-static Color::Modifier lightBlue(Color::Code::FG_LIGHT_BLUE);
-static Color::Modifier lightMagenta(Color::Code::FG_LIGHT_MAGENTA);
-static Color::Modifier lightCyan(Color::Code::FG_LIGHT_CYAN);
+// std::format support: embed an ANSI escape sequence directly in a format string.
+template <>
+struct std::formatter<Color::Modifier> {
+  constexpr auto parse(std::format_parse_context &ctx) const {
+    return ctx.begin();
+  }
+  auto format(Color::Modifier mod, std::format_context &ctx) const {
+    return std::format_to(ctx.out(), "\033[{}m",
+                          static_cast<int>(mod.value()));
+  }
+};

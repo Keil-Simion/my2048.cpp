@@ -48,9 +48,7 @@ using gamestatus_gameboard_t = std::tuple<gamestatus_t, GameBoard>;
  * @return gamestatus_gameboard_t A tuple containing the updated game status and game board.
  */
 gamestatus_gameboard_t process_gamelogic(gamestatus_gameboard_t gsgb) {
-  gamestatus_t gamestatus;
-  GameBoard gb;
-  std::tie(gamestatus, gb) = gsgb;
+  auto &[gamestatus, gb] = gsgb;
   unblockTilesOnGameboard(gb);
   if (gb.moved) {
     addTileOnGameboard(gb);
@@ -340,9 +338,7 @@ bool continue_playing_game(std::istream &in_os) {
  * - Added a prompt asking the user to enter a filename when saving the game state.
  */
 bool_gamestatus_t process_gameStatus(gamestatus_gameboard_t gsgb) {
-  gamestatus_t gamestatus;
-  GameBoard gb;
-  std::tie(gamestatus, gb) = gsgb;
+  auto &[gamestatus, gb] = gsgb;
   auto loop_again{true};
   if (!gamestatus[FLAG_ENDLESS_MODE]) {
     if (gamestatus[FLAG_WIN]) {
@@ -374,25 +370,20 @@ bool_gamestatus_t process_gameStatus(gamestatus_gameboard_t gsgb) {
 using bool_current_game_session_t = std::tuple<bool, current_game_session_t>;
 bool_current_game_session_t soloGameLoop(current_game_session_t cgs) {
   using namespace Input;
-  using tup_idx = tuple_cgs_t_idx;
-  const auto gamestatus =
-      std::addressof(std::get<tup_idx::IDX_GAMESTATUS>(cgs));
-  const auto gb = std::addressof(std::get<tup_idx::IDX_GAMEBOARD>(cgs));
+  auto &[bestScore, comp_mode, gamestatus, gb] = cgs;
 
-  std::tie(*gamestatus, *gb) =
-      process_gamelogic(std::make_tuple(*gamestatus, *gb));
+  std::tie(gamestatus, gb) = process_gamelogic({gamestatus, gb});
 
   DrawAlways(std::cout, DataSuppliment(cgs, drawGraphics));
-  *gamestatus = update_one_shot_display_flags(*gamestatus);
+  gamestatus = update_one_shot_display_flags(gamestatus);
 
   intendedmove_t player_intendedmove{};
-  std::tie(player_intendedmove, *gamestatus) =
-      receive_agent_input(player_intendedmove, *gamestatus);
-  std::tie(std::ignore, *gb) = process_agent_input(player_intendedmove, *gb);
+  std::tie(player_intendedmove, gamestatus) =
+      receive_agent_input(player_intendedmove, gamestatus);
+  std::tie(std::ignore, gb) = process_agent_input(player_intendedmove, gb);
 
   bool loop_again;
-  std::tie(loop_again, *gamestatus) =
-      process_gameStatus(std::make_tuple(*gamestatus, *gb));
+  std::tie(loop_again, gamestatus) = process_gameStatus({gamestatus, gb});
   return std::make_tuple(loop_again, cgs);
 }
 

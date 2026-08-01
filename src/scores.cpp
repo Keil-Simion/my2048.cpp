@@ -6,24 +6,11 @@
 #include <sstream>
 
 namespace {
-using namespace Scoreboard;
-bool generateFilefromScoreData(std::ostream &os, Score score) {
-  os << score;
-  return true;
-}
 
-Scoreboard_t generateScorefromFileData(std::istream &is) {
-  Score tempscore{};
-  Scoreboard_t scoreList{};
-  while (is >> tempscore) {
-    scoreList.push_back(tempscore);
-  };
-  return scoreList;
-}
-
-bool saveToFileScore(std::string filename, Score s) {
+bool saveToFileScore(std::string filename, Scoreboard::Score s) {
   std::ofstream os(filename, std::ios_base::app);
-  return generateFilefromScoreData(os, s);
+  os << s;
+  return static_cast<bool>(os);
 }
 
 } // namespace
@@ -35,13 +22,16 @@ bool operator>(const Score &a, const Score &b) {
 
 load_score_status_t loadFromFileScore(std::string filename) {
   std::ifstream scores(filename);
-  if (scores) {
-    Scoreboard_t scoreList = generateScorefromFileData(scores);
-    std::sort(std::begin(scoreList), std::end(scoreList),
-              std::greater<Score>{});
-    return load_score_status_t{true, scoreList};
+  if (!scores) {
+    return {false, {}};
   }
-  return load_score_status_t{false, Scoreboard_t{}};
+  Scoreboard_t scoreList{};
+  Score temp{};
+  while (scores >> temp) {
+    scoreList.push_back(temp);
+  }
+  std::sort(scoreList.begin(), scoreList.end(), std::greater<Score>{});
+  return {true, scoreList};
 }
 
 void saveScore(Score finalscore) {

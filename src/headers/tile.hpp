@@ -1,5 +1,4 @@
-#ifndef TILE_H
-#define TILE_H
+#pragma once
 
 #include "global.hpp"
 
@@ -9,5 +8,3 @@ struct tile_t {
   bool blocked{};
 };
 } // namespace Game
-
-#endif

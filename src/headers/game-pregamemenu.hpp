@@ -1,5 +1,4 @@
-#ifndef GAMEPREGAMEMENU_H
-#define GAMEPREGAMEMENU_H
+#pragma once
 
 #include <string>
 
@@ -11,5 +10,3 @@ void ContinueOldGame(const std::string& filename);
 
 } // namespace PreGameSetup
 } // namespace Game
-
-#endif
