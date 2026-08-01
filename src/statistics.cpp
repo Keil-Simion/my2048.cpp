@@ -54,11 +54,9 @@ load_stats_status_t loadFromFileStatistics(std::string filename) {
 }
 
 ull load_game_best_score() {
-  auto [stats_file_loaded, stats] = loadFromFileStatistics("../data/statistics.txt");
-  if (stats_file_loaded) {
-    return stats.bestScore;
-  }
-  return 0;
+  auto [stats_file_loaded, stats] =
+      loadFromFileStatistics("../data/statistics.txt");
+  return stats_file_loaded ? stats.bestScore : 0;
 }
 
 void saveEndGameStats(Scoreboard::Score finalscore) {
