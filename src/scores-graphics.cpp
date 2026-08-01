@@ -21,7 +21,7 @@
 namespace Scoreboard {
 namespace Graphics {
 
-std::string ScoreboardOverlay(scoreboard_display_data_list_t sbddl) {
+std::string ScoreboardOverlay(const scoreboard_display_data_list_t &sbddl) {
   constexpr auto no_save_text = "No saved scores.";
   constexpr auto header_border_text =
       "┌─────┬────────────────────┬──────────┬──────┬───────┬──────────────┬──────────────┐";
@@ -66,7 +66,7 @@ std::string ScoreboardOverlay(scoreboard_display_data_list_t sbddl) {
   return result;
 }
 
-std::string EndGameStatisticsPrompt(finalscore_display_data_t finalscore) {
+std::string EndGameStatisticsPrompt(const finalscore_display_data_t &finalscore) {
   constexpr auto stats_title_text = "STATISTICS";
   constexpr auto divider_text = "──────────";
   constexpr auto sp = "  ";

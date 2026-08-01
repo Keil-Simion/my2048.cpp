@@ -31,8 +31,8 @@ size_t getPlaySizeOfGameboardDataArray(const GameBoard::gameboard_data_array_t &
 tile_t getTileOnGameboardDataArray(const GameBoard::gameboard_data_array_t &gbda,
                                    point2D_t pt);
 
-bool hasWonOnGameboard(GameBoard gb);
-long long MoveCountOnGameBoard(GameBoard gb);
+bool hasWonOnGameboard(const GameBoard &gb);
+long long MoveCountOnGameBoard(const GameBoard &gb);
 
 void unblockTilesOnGameboard(GameBoard &gb);
 bool canMoveOnGameboard(GameBoard &gb);
@@ -44,6 +44,6 @@ void tumbleTilesDownOnGameboard(GameBoard &gb);
 void tumbleTilesLeftOnGameboard(GameBoard &gb);
 void tumbleTilesRightOnGameboard(GameBoard &gb);
 
-std::string printStateOfGameBoard(GameBoard gb);
+std::string printStateOfGameBoard(const GameBoard &gb);
 
 } // namespace Game

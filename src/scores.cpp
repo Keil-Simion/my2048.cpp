@@ -25,7 +25,7 @@ namespace {
 
 // 追加写（std::ios_base::app）到分数榜文件。
 // 返回 ofstream 的 bool 状态以反映写入是否成功。
-bool saveToFileScore(std::string filename, Scoreboard::Score s) {
+bool saveToFileScore(const std::string &filename, const Scoreboard::Score &s) {
   std::ofstream os(filename, std::ios_base::app);
   os << s;
   return static_cast<bool>(os);
@@ -54,7 +54,7 @@ load_score_status_t loadFromFileScore(std::string filename) {
   return {true, scoreList};
 }
 
-void saveScore(Score finalscore) {
+void saveScore(const Score &finalscore) {
   saveToFileScore("../data/scores.txt", finalscore);
 }
 
@@ -68,7 +68,7 @@ std::istream &operator>>(std::istream &is, Score &s) {
   return is;
 }
 
-std::ostream &operator<<(std::ostream &os, Score &s) {
+std::ostream &operator<<(std::ostream &os, const Score &s) {
   os << "\n"
      << s.name << " " << s.score << " " << s.win << " " << s.moveCount << " "
      << s.largestTile << " " << s.duration;

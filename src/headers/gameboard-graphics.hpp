@@ -9,7 +9,7 @@ namespace Game {
 struct GameBoard;
 namespace Gameboard {
 namespace Graphics {
-std::string GameBoardTextOutput(GameBoard gb);
+std::string GameBoardTextOutput(const GameBoard &gb);
 
 }
 } // namespace Gameboard

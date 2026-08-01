@@ -39,7 +39,7 @@ std::string MessageScoreSavedPrompt() {
                      score_saved_text, Color::bold_off, Color::def);
 }
 
-std::string TotalStatisticsOverlay(total_stats_display_data_t tsdd) {
+std::string TotalStatisticsOverlay(const total_stats_display_data_t &tsdd) {
   constexpr auto stats_title_text = "STATISTICS";
   constexpr auto divider_text = "──────────";
   constexpr auto header_border_text = "┌────────────────────┬─────────────┐";

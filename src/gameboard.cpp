@@ -33,7 +33,8 @@ using gameboard_data_array_t = GameBoard::gameboard_data_array_t;
 enum gameboard_data_array_fields { IDX_PLAYSIZE, IDX_BOARD, MAX_NO_INDEXES };
 
 struct gameboard_data_point_t {
-  static int point2D_to_1D_index(gameboard_data_array_t gbda, point2D_t pt) {
+  static int point2D_to_1D_index(const gameboard_data_array_t &gbda,
+                                 const point2D_t &pt) {
     int x, y;
     std::tie(x, y) = pt.get();
     return x + getPlaySizeOfGameboardDataArray(gbda) * y;
@@ -52,8 +53,8 @@ void setTileOnGameboardDataArray(gameboard_data_array_t &gbda, point2D_t pt,
   gameboard_data_point_t{}(gbda, pt) = tile;
 }
 
-ull getTileValueOnGameboardDataArray(gameboard_data_array_t gbda,
-                                     point2D_t pt) {
+ull getTileValueOnGameboardDataArray(const gameboard_data_array_t &gbda,
+                                     const point2D_t &pt) {
   return gameboard_data_point_t{}(gbda, pt).value;
 }
 
@@ -62,8 +63,8 @@ void setTileValueOnGameboardDataArray(gameboard_data_array_t &gbda,
   gameboard_data_point_t{}(gbda, pt).value = value;
 }
 
-bool getTileBlockedOnGameboardDataArray(gameboard_data_array_t gbda,
-                                        point2D_t pt) {
+bool getTileBlockedOnGameboardDataArray(const gameboard_data_array_t &gbda,
+                                        const point2D_t &pt) {
   return gameboard_data_point_t{}(gbda, pt).blocked;
 }
 
@@ -80,7 +81,7 @@ bool getTileBlockedOnGameboardDataArray(gameboard_data_array_t gbda,
  * @note Changes in the new version:
  * - Added a "[" character at the end of the string to indicate the end of the data.
  */
-std::string printStateOfGameBoardDataArray(gameboard_data_array_t gbda) {
+std::string printStateOfGameBoardDataArray(const gameboard_data_array_t &gbda) {
   const int playsize = getPlaySizeOfGameboardDataArray(gbda);
   std::ostringstream os;
   for (auto y = 0; y < playsize; y++) {
@@ -121,7 +122,7 @@ bool check_recursive_offset_in_game_bounds(delta_t dt_point, int playsize) {
 }
 
 gameboard_data_array_t
-unblockTilesOnGameboardDataArray(gameboard_data_array_t gbda) {
+unblockTilesOnGameboardDataArray(const gameboard_data_array_t &gbda) {
   using tile_data_array_t = GameBoard::tile_data_array_t;
   auto new_board_data_array =
       tile_data_array_t(std::get<IDX_BOARD>(gbda).size());
@@ -134,7 +135,7 @@ unblockTilesOnGameboardDataArray(gameboard_data_array_t gbda) {
                                 new_board_data_array};
 }
 
-bool canMoveOnGameboardDataArray(gameboard_data_array_t gbda) {
+bool canMoveOnGameboardDataArray(const gameboard_data_array_t &gbda) {
   auto index_counter{0};
 
   const auto can_move_to_offset = [=, &index_counter](const tile_t t) {
@@ -169,7 +170,7 @@ bool canMoveOnGameboardDataArray(gameboard_data_array_t gbda) {
 }
 
 std::vector<size_t>
-collectFreeTilesOnGameboardDataArray(gameboard_data_array_t gbda) {
+collectFreeTilesOnGameboardDataArray(const gameboard_data_array_t &gbda) {
   std::vector<size_t> freeTiles;
   auto index_counter{0};
   for (const auto t : std::get<IDX_BOARD>(gbda)) {
@@ -244,8 +245,8 @@ enum class COLLASPE_OR_SHIFT_T {
 using bool_collaspe_shift_t = std::tuple<bool, COLLASPE_OR_SHIFT_T>;
 
 bool_collaspe_shift_t
-collasped_or_shifted_tilesOnGameboardDataArray(gameboard_data_array_t gbda,
-                                               delta_t dt_point) {
+collasped_or_shifted_tilesOnGameboardDataArray(
+    const gameboard_data_array_t &gbda, const delta_t &dt_point) {
   const auto currentTile = getTileOnGameboardDataArray(gbda, dt_point.first);
   const auto targetTile =
       getTileOnGameboardDataArray(gbda, dt_point.first + dt_point.second);
@@ -383,11 +384,11 @@ tile_t getTileOnGameboardDataArray(const gameboard_data_array_t &gbda, point2D_t
   return gameboard_data_point_t{}(gbda, pt);
 }
 
-bool hasWonOnGameboard(GameBoard gb) {
+bool hasWonOnGameboard(const GameBoard &gb) {
   return gb.win;
 }
 
-long long MoveCountOnGameBoard(GameBoard gb) {
+long long MoveCountOnGameBoard(const GameBoard &gb) {
   return gb.moveCount;
 }
 
@@ -424,7 +425,7 @@ void tumbleTilesRightOnGameboard(GameBoard &gb) {
   doTumbleTilesRightOnGameboard(gb);
 }
 
-std::string printStateOfGameBoard(GameBoard gb) {
+std::string printStateOfGameBoard(const GameBoard &gb) {
   return printStateOfGameBoardDataArray(gb.gbda);
 }
 

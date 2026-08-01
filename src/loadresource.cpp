@@ -24,7 +24,7 @@ namespace {
  * @param filename The name of the file to be read.
  * @return The number of lines read before encountering a line with '['. Returns -1 if the file cannot be opened.
  */
-int GetLines(std::string filename) 
+int GetLines(const std::string &filename) 
 {
   std::ifstream stateFile(filename);
   if (!stateFile) {
@@ -85,7 +85,7 @@ std::vector<std::string> get_file_tile_data(std::istream &buf) {
 }
 
 std::vector<tile_t>
-process_file_tile_string_data(std::vector<std::string> buf) {
+process_file_tile_string_data(const std::vector<std::string> &buf) {
   std::vector<tile_t> result_buf;
   auto tile_processed_counter{0};
   const auto prime_tile_data =
@@ -157,7 +157,7 @@ get_and_process_game_stats_string_data(std::istream &stats_file) {
 
 } // namespace
 
-load_gameboard_status_t load_GameBoard_data_from_file(std::string filename) {
+load_gameboard_status_t load_GameBoard_data_from_file(const std::string &filename) {
   std::ifstream stateFile(filename);
   if (stateFile) {
     const ull savedBoardPlaySize = GetLines(filename);
@@ -172,7 +172,7 @@ load_gameboard_status_t load_GameBoard_data_from_file(std::string filename) {
 
 // Output: [loadfile_ok_status, gameboard.score, gameboard.moveCount]
 std::tuple<bool, std::tuple<unsigned long long, long long>>
-load_game_stats_from_file(std::string filename) {
+load_game_stats_from_file(const std::string &filename) {
   std::ifstream stats(filename);
   return get_and_process_game_stats_string_data(stats);
 }
@@ -190,7 +190,7 @@ load_game_stats_from_file(std::string filename) {
  * @param gb The GameBoard object to be initialized with the read data.
  * @return true if the game data was successfully loaded; false otherwise.
  */
-bool load_game(std::string fileName, GameBoard& gb)
+bool load_game(const std::string &fileName, GameBoard& gb)
 {
   std::ifstream stateFile(fileName);
   if(!stateFile.is_open())

@@ -35,8 +35,8 @@ bool noSave{};
 
 void process_PreGameMenu() {
   if (pregamesetup_status[FLAG_START_GAME]) {
-    playGame(PlayGameFlag::BrandNewGame, GameBoard{stored_game_size},
-             stored_game_size);
+    auto new_gb = GameBoard{stored_game_size};
+    playGame(PlayGameFlag::BrandNewGame, new_gb, stored_game_size);
   }
   if (pregamesetup_status[FLAG_RETURN_TO_MAIN_MENU]) {
     Menu::startMenu();

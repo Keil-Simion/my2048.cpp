@@ -42,14 +42,15 @@ std::string receive_input_player_name(std::istream &is) {
 
 // 直接把 stats 写入文件；返回值改为 ofstream 的 bool 状态，
 // 比"先写再 return true"更诚实（如果写入失败至少能反映）。
-bool saveToFileEndGameStatistics(std::string filename, total_game_stats_t s) {
+bool saveToFileEndGameStatistics(const std::string &filename,
+                                 const total_game_stats_t &s) {
   std::ofstream filedata(filename);
   filedata << s;
   return static_cast<bool>(filedata);
 }
 
 Scoreboard::Graphics::finalscore_display_data_t
-make_finalscore_display_data(Scoreboard::Score finalscore) {
+make_finalscore_display_data(const Scoreboard::Score &finalscore) {
   return {
       std::to_string(finalscore.score), std::to_string(finalscore.largestTile),
       std::to_string(finalscore.moveCount), secondsFormat(finalscore.duration)};
@@ -57,7 +58,7 @@ make_finalscore_display_data(Scoreboard::Score finalscore) {
 
 } // namespace
 
-load_stats_status_t loadFromFileStatistics(std::string filename) {
+load_stats_status_t loadFromFileStatistics(const std::string &filename) {
   std::ifstream statistics(filename);
   if (!statistics) {
     return {false, {}};
@@ -75,7 +76,7 @@ ull load_game_best_score() {
   return stats_file_loaded ? stats.bestScore : 0;
 }
 
-void saveEndGameStats(Scoreboard::Score finalscore) {
+void saveEndGameStats(const Scoreboard::Score &finalscore) {
   // 不关心是否成功加载 —— 即使没读到旧值，也会从默认零值开始累加。
   auto [_, stats] = loadFromFileStatistics("../data/statistics.txt");
   stats.bestScore = std::max(stats.bestScore, finalscore.score);
@@ -90,7 +91,7 @@ void saveEndGameStats(Scoreboard::Score finalscore) {
 }
 
 void CreateFinalScoreAndEndGameDataFile(std::ostream &os, std::istream &is,
-                                        Scoreboard::Score finalscore) {
+                                        Scoreboard::Score &finalscore) {
   const auto finalscore_display_data = make_finalscore_display_data(finalscore);
   DrawAlways(os, DataSuppliment(finalscore_display_data,
                                 Scoreboard::Graphics::EndGameStatisticsPrompt));
@@ -114,7 +115,7 @@ std::istream &operator>>(std::istream &is, total_game_stats_t &s) {
   return is;
 }
 
-std::ostream &operator<<(std::ostream &os, total_game_stats_t &s) {
+std::ostream &operator<<(std::ostream &os, const total_game_stats_t &s) {
   os << s.bestScore << "\n"
      << s.gameCount << "\n"
      << s.winCount << "\n"

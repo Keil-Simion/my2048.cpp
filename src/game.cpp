@@ -76,8 +76,8 @@ using gamestatus_gameboard_t = std::tuple<gamestatus_t, GameBoard>;
  *     改进：去掉两个临时变量声明；语义上明确表达"这两个名字是 gsgb
  *     元素的别名"，未来如果只读不写也能直接换 const auto&。
  */
-gamestatus_gameboard_t process_gamelogic(gamestatus_gameboard_t gsgb) {
-  auto &[gamestatus, gb] = gsgb;
+gamestatus_gameboard_t process_gamelogic(const gamestatus_gameboard_t &gsgb) {
+  auto [gamestatus, gb] = gsgb;
   unblockTilesOnGameboard(gb);
   if (gb.moved) {
     addTileOnGameboard(gb);
@@ -124,7 +124,7 @@ gamestatus_gameboard_t process_gamelogic(gamestatus_gameboard_t gsgb) {
 using competition_mode_t = bool;
 Graphics::scoreboard_display_data_t
 make_scoreboard_display_data(ull bestScore, competition_mode_t cm,
-                             GameBoard gb) {
+                             const GameBoard &gb) {
   const auto gameboard_score = gb.score;
   const auto tempBestScore = (bestScore < gb.score ? gb.score : bestScore);
   const auto comp_mode = cm;
@@ -162,7 +162,7 @@ enum tuple_cgs_t_idx {
   IDX_GAMEBOARD
 };
 
-std::string drawGraphics(current_game_session_t cgs) {
+std::string drawGraphics(const current_game_session_t &cgs) {
   // Graphical Output has a specific ordering...
   using namespace Graphics;
   using namespace Gameboard::Graphics;
@@ -292,45 +292,47 @@ receive_agent_input(Input::intendedmove_t intendedmove,
   return std::make_tuple(intendedmove, gamestatus);
 }
 
-GameBoard decideMove(Directions d, GameBoard gb) {
+GameBoard decideMove(Directions d, const GameBoard &gb) {
+  auto new_gb = gb;
   switch (d) {
   case UP:
-    tumbleTilesUpOnGameboard(gb);
+    tumbleTilesUpOnGameboard(new_gb);
     break;
 
   case DOWN:
-    tumbleTilesDownOnGameboard(gb);
+    tumbleTilesDownOnGameboard(new_gb);
     break;
 
   case LEFT:
-    tumbleTilesLeftOnGameboard(gb);
+    tumbleTilesLeftOnGameboard(new_gb);
     break;
 
   case RIGHT:
-    tumbleTilesRightOnGameboard(gb);
+    tumbleTilesRightOnGameboard(new_gb);
     break;
   }
-  return gb;
+  return new_gb;
 }
 
 using bool_gameboard_t = std::tuple<bool, GameBoard>;
 bool_gameboard_t process_agent_input(Input::intendedmove_t intendedmove,
-                                     GameBoard gb) {
+                                     const GameBoard &gb) {
   using namespace Input;
+  auto new_gb = gb;
   if (intendedmove[FLAG_MOVE_LEFT]) {
-    gb = decideMove(LEFT, gb);
+    new_gb = decideMove(LEFT, new_gb);
   }
   if (intendedmove[FLAG_MOVE_RIGHT]) {
-    gb = decideMove(RIGHT, gb);
+    new_gb = decideMove(RIGHT, new_gb);
   }
   if (intendedmove[FLAG_MOVE_UP]) {
-    gb = decideMove(UP, gb);
+    new_gb = decideMove(UP, new_gb);
   }
   if (intendedmove[FLAG_MOVE_DOWN]) {
-    gb = decideMove(DOWN, gb);
+    new_gb = decideMove(DOWN, new_gb);
   }
 
-  return std::make_tuple(true, gb);
+  return std::make_tuple(true, new_gb);
 }
 
 bool check_input_check_to_end_game(char c) {
@@ -357,8 +359,8 @@ bool continue_playing_game(std::istream &in_os) {
  * 本次重构：与 process_gamelogic 一样，把 std::tie 替换为
  * `auto &[gamestatus, gb] = gsgb;` 的结构化绑定，意图更清晰。
  */
-bool_gamestatus_t process_gameStatus(gamestatus_gameboard_t gsgb) {
-  auto &[gamestatus, gb] = gsgb;
+bool_gamestatus_t process_gameStatus(const gamestatus_gameboard_t &gsgb) {
+  auto [gamestatus, gb] = gsgb;
   auto loop_again{true};
   if (!gamestatus[FLAG_ENDLESS_MODE]) {
     if (gamestatus[FLAG_WIN]) {
@@ -435,7 +437,7 @@ make_end_screen_display_data(gamestatus_t world_gamestatus) {
   return esdd;
 };
 
-std::string drawEndGameLoopGraphics(current_game_session_t finalgamestatus) {
+std::string drawEndGameLoopGraphics(const current_game_session_t &finalgamestatus) {
   // Graphical Output has a specific ordering...
   using namespace Graphics;
   using namespace Gameboard::Graphics;
@@ -485,7 +487,7 @@ std::string drawEndGameLoopGraphics(current_game_session_t finalgamestatus) {
  * - The loop will terminate if the user presses the M key and the state changes to MENU.
  */
 GameBoard endlessGameLoop(ull currentBestScore, competition_mode_t cm,
-                          GameBoard gb) {
+                          const GameBoard &gb) {
   auto loop_again{true};
   auto currentgamestatus =
       std::make_tuple(currentBestScore, cm, gamestatus_t{}, gb);
@@ -502,7 +504,7 @@ GameBoard endlessGameLoop(ull currentBestScore, competition_mode_t cm,
 }
 
 Scoreboard::Score make_finalscore_from_game_session(double duration,
-                                                    GameBoard gb) {
+                                                    const GameBoard &gb) {
   Scoreboard::Score finalscore{};
   finalscore.score = gb.score;
   finalscore.win = hasWonOnGameboard(gb);
@@ -521,7 +523,7 @@ void DoPostGameSaveStuff(Scoreboard::Score finalscore, competition_mode_t cm) {
 
 } // namespace
 
-void playGame(PlayGameFlag cont, GameBoard gb, ull userInput_PlaySize) {
+void playGame(PlayGameFlag cont, GameBoard &gb, ull userInput_PlaySize) {
   const auto is_this_a_new_game = (cont == PlayGameFlag::BrandNewGame);
   const auto is_competition_mode =
       (userInput_PlaySize == COMPETITION_GAME_BOARD_PLAY_SIZE);

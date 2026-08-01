@@ -42,7 +42,7 @@ std::array<std::string, num_of_bars> make_patterned_bars(int playsize) {
   return temp_bars;
 }
 
-std::string drawSelf(GameBoard::gameboard_data_array_t gbda) {
+std::string drawSelf(const GameBoard::gameboard_data_array_t &gbda) {
   enum { TOP_BAR, XN_BAR, BASE_BAR, MAX_TYPES_OF_BARS };
   const int playsize = getPlaySizeOfGameboardDataArray(gbda);
   const auto vertibar = make_patterned_bars<MAX_TYPES_OF_BARS>(playsize);
@@ -69,7 +69,7 @@ std::string drawSelf(GameBoard::gameboard_data_array_t gbda) {
 
 } // namespace
 
-std::string GameBoardTextOutput(GameBoard gb) {
+std::string GameBoardTextOutput(const GameBoard &gb) {
   return drawSelf(gb.gbda);
 }
 } // namespace Graphics

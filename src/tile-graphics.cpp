@@ -43,7 +43,7 @@ Color::Modifier tileColor(ull value) {
 }
 } // namespace
 
-std::string drawTileString(tile_t currentTile) {
+std::string drawTileString(const tile_t &currentTile) {
   if (!currentTile.value) {
     return "    ";
   }

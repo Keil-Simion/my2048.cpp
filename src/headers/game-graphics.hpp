@@ -29,8 +29,8 @@ std::string EndlessModeCommandListPrompt();
 std::string InputCommandListFooterPrompt();
 using scoreboard_display_data_t =
     std::tuple<bool, std::string, std::string, std::string>;
-std::string GameScoreBoardBox(scoreboard_display_data_t scdd);
-std::string GameScoreBoardOverlay(scoreboard_display_data_t scdd);
+std::string GameScoreBoardBox(const scoreboard_display_data_t &scdd);
+std::string GameScoreBoardOverlay(const scoreboard_display_data_t &scdd);
 using end_screen_display_data_t = std::tuple<bool, bool>;
 std::string GameEndScreenOverlay(end_screen_display_data_t esdd);
 using input_controls_display_data_t = std::tuple<bool, bool>;

@@ -7,5 +7,5 @@
 
 namespace Game {
 struct tile_t;
-std::string drawTileString(tile_t currentTile);
+std::string drawTileString(const tile_t &currentTile);
 } // namespace Game

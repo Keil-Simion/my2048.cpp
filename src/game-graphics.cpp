@@ -156,7 +156,7 @@ std::string InputCommandListFooterPrompt() {
   return std::format("{0} \n{0}Press the keys to start and continue.\n{0} \n\n", sp);
 }
 
-std::string GameScoreBoardBox(scoreboard_display_data_t scdd) {
+std::string GameScoreBoardBox(const scoreboard_display_data_t &scdd) {
   // * border padding: vvv
   // | l-outer: 2, r-outer: 0
   // | l-inner: 1, r-inner: 1
@@ -232,7 +232,7 @@ std::string GameScoreBoardBox(scoreboard_display_data_t scdd) {
   return result;
 }
 
-std::string GameScoreBoardOverlay(scoreboard_display_data_t scdd) {
+std::string GameScoreBoardOverlay(const scoreboard_display_data_t &scdd) {
   std::ostringstream str_os;
   DrawAlways(str_os, DataSuppliment(scdd, GameScoreBoardBox));
   return str_os.str();

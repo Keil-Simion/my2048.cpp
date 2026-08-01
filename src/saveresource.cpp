@@ -51,7 +51,7 @@ bool generateFilefromPreviousGameStateData(std::ostream &os,
  * @param filename The name of the file where the game state and statistics will be saved.
  * @param gb The game board containing the state and statistics to be saved.
  */
-void saveToFilePreviousGameStateData(std::string filename,
+void saveToFilePreviousGameStateData(const std::string &filename,
                                      const GameBoard &gb) {
   std::ofstream stateFile(filename, std::ios_base::app);
   generateFilefromPreviousGameStateData(stateFile, gb);
@@ -87,7 +87,7 @@ void saveToFilePreviousGameStateData(std::string filename,
  * @note If the directory does not exist, it will be created. Ensure that the application
  *       has the necessary permissions to write to the specified location.
  */
-void saveGamePlayState(GameBoard gb, const std::string& filename) {
+void saveGamePlayState(const GameBoard &gb, const std::string &filename) {
   std::filesystem::path directory_path = "../data/SavedGameFiles/";
 
   if (!std::filesystem::exists(directory_path))

@@ -133,7 +133,7 @@ make_scoreboard_display_data_list() {
   auto [_, scoreList] = Scoreboard::loadFromFileScore("../data/scores.txt");
 
   auto counter{1};
-  const auto convert_to_display_list_t = [&counter](const Scoreboard::Score s) {
+  const auto convert_to_display_list_t = [&counter](const Scoreboard::Score &s) {
     const auto data_stats = std::make_tuple(
         std::to_string(counter), s.name, std::to_string(s.score),
         s.win ? "Yes" : "No", std::to_string(s.moveCount),
