@@ -54,15 +54,11 @@ load_stats_status_t loadFromFileStatistics(std::string filename) {
 }
 
 ull load_game_best_score() {
-  total_game_stats_t stats;
-  bool stats_file_loaded{};
-  ull tempscore{0};
-  std::tie(stats_file_loaded, stats) =
-      loadFromFileStatistics("../data/statistics.txt");
+  auto [stats_file_loaded, stats] = loadFromFileStatistics("../data/statistics.txt");
   if (stats_file_loaded) {
-    tempscore = stats.bestScore;
+    return stats.bestScore;
   }
-  return tempscore;
+  return 0;
 }
 
 void saveEndGameStats(Scoreboard::Score finalscore) {
