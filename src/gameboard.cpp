@@ -39,7 +39,7 @@ struct gameboard_data_point_t {
     return x + getPlaySizeOfGameboardDataArray(gbda) * y;
   }
 
-  tile_t operator()(gameboard_data_array_t gbda, point2D_t pt) const {
+  tile_t operator()(const gameboard_data_array_t& gbda, point2D_t pt) const {
     return std::get<IDX_BOARD>(gbda)[point2D_to_1D_index(gbda, pt)];
   }
   tile_t &operator()(gameboard_data_array_t &gbda, point2D_t pt) {
@@ -375,11 +375,11 @@ GameBoard::GameBoard(ull playsize, tile_data_array_t prempt_board)
     : gbda{playsize, std::move(prempt_board)} {
 }
 
-size_t getPlaySizeOfGameboardDataArray(gameboard_data_array_t gbda) {
+size_t getPlaySizeOfGameboardDataArray(const gameboard_data_array_t &gbda) {
   return std::get<IDX_PLAYSIZE>(gbda);
 }
 
-tile_t getTileOnGameboardDataArray(gameboard_data_array_t gbda, point2D_t pt) {
+tile_t getTileOnGameboardDataArray(const gameboard_data_array_t &gbda, point2D_t pt) {
   return gameboard_data_point_t{}(gbda, pt);
 }
 

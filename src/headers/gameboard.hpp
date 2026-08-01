@@ -27,8 +27,8 @@ struct GameBoard {
   explicit GameBoard(ull playsize, tile_data_array_t prempt_board);
 };
 
-size_t getPlaySizeOfGameboardDataArray(GameBoard::gameboard_data_array_t gbda);
-tile_t getTileOnGameboardDataArray(GameBoard::gameboard_data_array_t gbda,
+size_t getPlaySizeOfGameboardDataArray(const GameBoard::gameboard_data_array_t &gbda);
+tile_t getTileOnGameboardDataArray(const GameBoard::gameboard_data_array_t &gbda,
                                    point2D_t pt);
 
 bool hasWonOnGameboard(GameBoard gb);
