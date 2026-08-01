@@ -372,7 +372,7 @@ GameBoard::GameBoard(ull playsize)
     : GameBoard{playsize, tile_data_array_t(playsize * playsize)} {
 }
 GameBoard::GameBoard(ull playsize, tile_data_array_t prempt_board)
-    : gbda{playsize, prempt_board} {
+    : gbda{playsize, std::move(prempt_board)} {
 }
 
 size_t getPlaySizeOfGameboardDataArray(gameboard_data_array_t gbda) {
