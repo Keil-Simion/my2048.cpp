@@ -66,7 +66,8 @@ void receive_input_flags(std::istream &is) {
   const auto c = Receive_Input_Playsize(is);
 
   const auto is_valid_game_size =
-      (c >= MIN_GAME_BOARD_PLAY_SIZE) && (c <= MAX_GAME_BOARD_PLAY_SIZE);
+      (c >= static_cast<int>(GameBoardDimensions::MIN_GAME_BOARD_PLAY_SIZE)) &&
+      (c <= static_cast<int>(GameBoardDimensions::MAX_GAME_BOARD_PLAY_SIZE));
 
   // Regular case;
   if (is_valid_game_size) {

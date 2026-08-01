@@ -1,5 +1,4 @@
-#ifndef MENU_H
-#define MENU_H
+#pragma once
 
 #include <array>
 #include "gameboard.hpp"
@@ -44,5 +43,3 @@ std::string chooseGameState(const std::vector<std::string>& gamestate);
 namespace Menu {
 void startMenu();
 } // namespace Menu
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GAMEINPUT_H
-#define GAMEINPUT_H
+#pragma once
 
 #include <array>
 
@@ -68,5 +67,3 @@ bool check_input_wasd(char c, intendedmove_t &intendedmove);
 
 } // namespace Input
 } // namespace Game
-
-#endif
