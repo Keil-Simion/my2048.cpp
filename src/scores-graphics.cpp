@@ -1,3 +1,17 @@
+// =====================================================================
+//  scores-graphics.cpp —— 分数榜 / 终局统计的绘制
+// ---------------------------------------------------------------------
+//  本次重构要点：
+//    1) ScoreboardOverlay：把表头循环 7 次
+//         std::begin(score_attributes_text)[i]
+//       改为在格式串里直接列 7 个字段名 + 显式宽度。
+//       等价输出，但格式串里一行的对齐一目了然。
+//    2) 表内每一行的循环也改用 std::format 的对齐语法（{:<18} /
+//       {:>8} 等），替代旧的 std::setw + std::left / std::right 切换。
+//    3) EndGameStatisticsPrompt 同理：lambda + counter 改为 for + 索引。
+//    4) 颜色统一用 Color::xxx 显式调用。
+// =====================================================================
+
 #include "scores-graphics.hpp"
 #include "color.hpp"
 #include <array>
@@ -31,6 +45,8 @@ std::string ScoreboardOverlay(scoreboard_display_data_list_t sbddl) {
   }
 
   result += std::format("{}{}\n", sp, header_border_text);
+  // 表头：颜色在三个文字字段上切换（No. / Name / Score），其余直接输出。
+  // 对齐语法 {:<18} 左对齐宽度 18，{:>8} 右对齐宽度 8，依次类推。
   result += std::format(
       "{}│ {}{:<3}{} │ {}{:<18}{} │ {}{:>8}{} │ {:>4} │ {:>5} │ {:>12} │ {:>12} │\n",
       sp, Color::bold_on, "No.", Color::bold_off, Color::bold_on, "Name",
@@ -39,6 +55,8 @@ std::string ScoreboardOverlay(scoreboard_display_data_list_t sbddl) {
   result += std::format("{}{}\n", sp, mid_border_text);
 
   for (const auto &row : sbddl) {
+    // 数据行：每个字段单独 std::get<i>(row) 取出。tuple 解构可读，
+    // 也方便日后调整列顺序（只需调整 std::get 索引）。
     result += std::format(
         "{}│ {:>2}. │ {:<18} │ {:>8} │ {:>4} │ {:>5} │ {:>12} │ {:>12} │\n", sp,
         std::get<0>(row), std::get<1>(row), std::get<2>(row), std::get<3>(row),
@@ -70,11 +88,13 @@ std::string EndGameStatisticsPrompt(finalscore_display_data_t finalscore) {
                                       "Number of moves:", "Time taken:"};
 
   std::string result;
+  // 黄色作为这一节的强调色。
   result += std::format("{}{}{}{}\n", Color::yellow, sp, stats_title_text,
                         Color::def);
   result += std::format("{}{}{}{}\n", Color::yellow, sp, divider_text, Color::def);
 
   for (auto i = 0u; i < data_stats.size(); ++i) {
+    // 属性名左对齐 19 列；数值加粗。
     result += std::format("{}{:<19}{}{}{}\n", sp,
                           std::string{std::begin(stats_attributes_text)[i]},
                           Color::bold_on, data_stats[i], Color::bold_off);

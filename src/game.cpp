@@ -1,3 +1,29 @@
+// =====================================================================
+//  game.cpp —— 游戏主循环 / 状态机
+// ---------------------------------------------------------------------
+//  本次重构涉及的改动：
+//    1) 把所有 "先声明临时变量再 std::tie 接收返回值" 的写法，
+//       统一改为 C++17 的结构化绑定：
+//         - process_gamelogic：auto &[gamestatus, gb] = gsgb;
+//         - process_gameStatus：auto &[gamestatus, gb] = gsgb;
+//         - soloGameLoop      ：auto &[bestScore, comp_mode,
+//                                       gamestatus, gb] = cgs;
+//       改进点：
+//         - 少 2~3 行变量声明；
+//         - 引用绑定写回 tuple，无需 std::addressof / * 解引用，
+//           可读性大幅提升；
+//         - 与 C++20 的 std::format 配套，整体代码风格更现代。
+//
+//    2) 把 std::make_tuple(gamestatus, gb) 全部替换为
+//       花括号初始化 {gamestatus, gb}，依赖 C++17 引入的
+//       "CTAD for aggregates"，更轻量、也更显式。
+//
+//    3) 单独的 make_tuple 调用（如返回值）保留 std::make_tuple，
+//       不强行替换。
+//
+//  本文件其余逻辑（按键翻译、棋盘推进、终局处理）未做改动。
+// =====================================================================
+
 #include "game.hpp"
 #include "game-graphics.hpp"
 #include "game-input.hpp"
@@ -39,13 +65,16 @@ using gamestatus_gameboard_t = std::tuple<gamestatus_t, GameBoard>;
 
 /**
  * @brief Processes the game logic for the current game state.
- * 
- * This function updates the game status and game board based on the current state.
- * It handles tile movements, checks for game-winning conditions, and verifies if the game can continue.
- * If the player cannot make any more moves, it prompts the player to remove random tiles before ending the game.
- * 
- * @param gsgb A tuple containing the current game status and game board.
- * @return gamestatus_gameboard_t A tuple containing the updated game status and game board.
+ *
+ * 本次重构：
+ *   - 旧写法：
+ *         gamestatus_t gamestatus;
+ *         GameBoard gb;
+ *         std::tie(gamestatus, gb) = gsgb;
+ *     现在改为结构化绑定（引用形式）：
+ *         auto &[gamestatus, gb] = gsgb;
+ *     改进：去掉两个临时变量声明；语义上明确表达"这两个名字是 gsgb
+ *     元素的别名"，未来如果只读不写也能直接换 const auto&。
  */
 gamestatus_gameboard_t process_gamelogic(gamestatus_gameboard_t gsgb) {
   auto &[gamestatus, gb] = gsgb;
@@ -324,18 +353,9 @@ bool continue_playing_game(std::istream &in_os) {
 
 /**
  * @brief Processes the current game status and updates the game loop control.
- * 
- * This function evaluates the current game status flags and takes appropriate actions:
- * - It handles winning conditions and prompts the user to continue playing.
- * - It checks for the end of the game conditions.
- * - It manages saving the game state by prompting the user for a filename.
- * - It resets the question asking event trigger for a new loop cycle.
- * 
- * @param gsgb A tuple containing the current game status and game board.
- * @return bool_gamestatus_t A tuple containing a boolean indicating whether to continue the game loop and the updated game status flags.
- * 
- * @note Changes in the new version:
- * - Added a prompt asking the user to enter a filename when saving the game state.
+ *
+ * 本次重构：与 process_gamelogic 一样，把 std::tie 替换为
+ * `auto &[gamestatus, gb] = gsgb;` 的结构化绑定，意图更清晰。
  */
 bool_gamestatus_t process_gameStatus(gamestatus_gameboard_t gsgb) {
   auto &[gamestatus, gb] = gsgb;
@@ -368,6 +388,27 @@ bool_gamestatus_t process_gameStatus(gamestatus_gameboard_t gsgb) {
 }
 
 using bool_current_game_session_t = std::tuple<bool, current_game_session_t>;
+
+/**
+ * 本次重构要点（soloGameLoop）：
+ *
+ *   旧写法使用 std::addressof + 多次解引用，看起来很绕：
+ *       const auto gamestatus = std::addressof(std::get<...>(cgs));
+ *       const auto gb         = std::addressof(std::get<...>(cgs));
+ *       std::tie(*gamestatus, *gb) = process_gamelogic({*gamestatus, *gb});
+ *
+ *   新写法直接用 `auto &[bestScore, comp_mode, gamestatus, gb] = cgs;`
+ *   一行拿到 4 个元素的引用，后续修改直接通过别名写回 tuple：
+ *       std::tie(gamestatus, gb) = process_gamelogic({gamestatus, gb});
+ *
+ *   改进点：
+ *     - 不再需要 std::addressof + * 解引用，可读性大幅提升；
+ *     - 一次性把整个 tuple 解构出来，不再依赖 IDX_* 枚举（见
+ *       tuple_cgs_t_idx，新写法里没用到，但保留以兼容 drawGraphics /
+ *       drawEndGameLoopGraphics 等其他位置）。
+ *     - {gamestatus, gb} 用花括号初始化 tuple，比 std::make_tuple 更
+ *       现代、更轻量（无需模板推导）。
+ */
 bool_current_game_session_t soloGameLoop(current_game_session_t cgs) {
   using namespace Input;
   auto &[bestScore, comp_mode, gamestatus, gb] = cgs;

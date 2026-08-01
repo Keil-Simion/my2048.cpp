@@ -149,12 +149,16 @@ load_gameboard_status_t initialiseContinueBoardArray(const std::string& filename
 
 /**
  * @brief Continues a previously saved game from a specified file.
- * 
- * This function attempts to load the game state from the provided filename.
- * If successful, it continues the game using the loaded state. If the loading
- * fails, it sets up a new game indicating that no previous save is available.
- * 
- * @param filename The name of the file from which to load the previous game state.
+ *
+ * 本次重构：去掉显式 std::tie + 两个临时变量，改为结构化绑定：
+ *   旧：
+ *     bool load_old_game_ok;
+ *     GameBoard oldGameBoard;
+ *     std::tie(load_old_game_ok, oldGameBoard) =
+ *         initialiseContinueBoardArray(filename);
+ *   新：
+ *     auto [load_old_game_ok, oldGameBoard] =
+ *         initialiseContinueBoardArray(filename);
  */
 void DoContinueOldGame(const std::string& filename) {
   auto [load_old_game_ok, oldGameBoard] = initialiseContinueBoardArray(filename);

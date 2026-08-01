@@ -1,3 +1,19 @@
+// =====================================================================
+//  statistics-graphics.cpp —— 统计信息面板的绘制
+// ---------------------------------------------------------------------
+//  本次重构要点：
+//    1) AskForPlayerNamePrompt / MessageScoreSavedPrompt /
+//       TotalStatisticsOverlay 全部从 ostringstream 改为 std::format。
+//    2) TotalStatisticsOverlay 的循环里，旧写法使用了一个 lambda +
+//       counter 外部引用来格式化每一行：
+//           const auto populate_stats_info = [=, &counter, &stats_richtext]...
+//       重构后直接用 for 循环 + 索引到 initializer_list，逻辑等价但
+//       不需要把 stats_richtext / counter 用引用捕获，少了一层闭包
+//       状态，可读性更高。
+//    3) 颜色与对齐仍然显式写 Color::xxx + std::format 的对齐语法
+//       （{:<18} 左对齐 18 列，{:>11} 右对齐 11 列）。
+// =====================================================================
+
 #include "statistics-graphics.hpp"
 #include "color.hpp"
 #include <array>
@@ -56,6 +72,9 @@ std::string TotalStatisticsOverlay(total_stats_display_data_t tsdd) {
         "Best Score", "Game Count", "Number of Wins", "Total Moves Played",
         "Total Duration"};
 
+    // 旧写法使用 [=, &counter, &stats_richtext] 闭包反复调用
+    // populate_stats_info；新写法改为普通 for 循环，逻辑等价但不再
+    // 需要把输出流与计数器用引用捕获，少了一层隐式状态。
     std::string result;
     result += std::format("{}{}{}{}{}{}\n", Color::green, Color::bold_on, sp,
                           stats_title_text, Color::bold_off, Color::def);
@@ -64,6 +83,7 @@ std::string TotalStatisticsOverlay(total_stats_display_data_t tsdd) {
     result += std::format("{}{}\n", sp, header_border_text);
 
     for (auto i = 0u; i < data_stats.size(); ++i) {
+      // {::18} 左对齐 18 列（属性名）；{:>11} 右对齐 11 列（数值）。
       result += std::format(
           "{}│ {}{:<18}{} │ {:>11} │\n", sp, Color::bold_on,
           std::string{std::begin(stats_attributes_text)[i]}, Color::bold_off,

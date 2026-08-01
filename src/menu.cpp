@@ -122,6 +122,13 @@ void continueGame()
 Scoreboard::Graphics::scoreboard_display_data_list_t
 make_scoreboard_display_data_list() {
   using namespace Scoreboard::Graphics;
+  // 本次重构：
+  //   旧写法：
+  //     Scoreboard_t scoreList;
+  //     std::tie(std::ignore, scoreList) = Scoreboard::loadFromFileScore(...);
+  //   现在：
+  //     auto [_, scoreList] = ...;
+  //   结构化绑定 + `_` 显式忽略，比 std::tie(std::ignore, ...) 更地道。
   // Warning: Does not care if file exists or not!
   auto [_, scoreList] = Scoreboard::loadFromFileScore("../data/scores.txt");
 
@@ -142,6 +149,10 @@ make_scoreboard_display_data_list() {
   return scoreboard_display_list;
 };
 
+// 本次重构：
+//   旧写法需要先声明 stats_file_loaded / stats 两个临时变量，再用
+//   std::tie 接收 loadFromFileStatistics 的返回值；现在直接
+//   `auto [stats_file_loaded, stats] = ...;`，少 4 行代码。
 Statistics::Graphics::total_stats_display_data_t
 make_total_stats_display_data() {
   auto [stats_file_loaded, stats] =

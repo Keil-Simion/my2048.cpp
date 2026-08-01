@@ -1,3 +1,37 @@
+// =====================================================================
+//  game-graphics.cpp —— 游戏界面绘图函数
+// ---------------------------------------------------------------------
+//  本文件集中输出"游戏内"用到的所有提示文本（标题、胜/负提示、
+//  输入错误、按键帮助、得分框等）。
+//
+//  本次重构的核心改动：
+//    1) 把所有"用 std::ostringstream 链式 << 拼接 ANSI 转义序列 +
+//       文本"的写法，改为 std::format + Color::xxx 的写法。
+//       对比：
+//         旧（典型样式）：
+//           std::ostringstream oss;
+//           oss << red << bold_on << title_card_2048 << bold_off << def;
+//           oss << "\n\n\n";
+//           return oss.str();
+//         新：
+//           return std::format("{}{}{}{}{}\n\n\n",
+//                              Color::red, Color::bold_on, title_card_2048,
+//                              Color::bold_off, Color::def);
+//       改进点：
+//         - 一步到位，少了"先建 ostringstream 再 str()"的开销；
+//         - 颜色顺序在调用处一目了然（不再散落在多行 << 中）；
+//         - 编译期可对格式串做静态校验（参数数量、类型匹配），少一类
+//           "忘了写 bold_off"导致的隐性 bug；
+//         - 显式 `Color::xxx` 写法符合本项目"避免 using namespace"的
+//           现代编码风格（参见 archive 移除后的决定）。
+//
+//    2) 所有输入命令帮助文本（InputCommandListPrompt 等）同样改为
+//       std::format 直接拼接，逻辑不变但更紧凑。
+//
+//    3) GameScoreBoardBox 的内层拼接改用 lambda + std::format，
+//       把"右对齐填充空格"这段重复代码抽出来，更易读。
+// =====================================================================
+
 #include "game-graphics.hpp"
 #include "color.hpp"
 #include "global.hpp"
@@ -8,6 +42,7 @@
 
 namespace Game {
 namespace Graphics {
+
 std::string AsciiArt2048() {
   constexpr auto title_card_2048 = R"(
      _   __ ______ ______ _____  __  __ ____  _       __
@@ -16,12 +51,16 @@ std::string AsciiArt2048() {
   / /|  // /___   / /   ___/ // __  // /_/ / | |/ |/ /
  /_/ |_//_____/  /_/   /____//_/ /_/ \____/  |__/|__/
   )";
+  // 旧写法：ostringstream 链式 <<
+  // 新写法：std::format 把 ANSI 颜色与正文放在一个表达式里，可读性更好。
   return std::format("{}{}{}{}{}\n\n\n", Color::red, Color::bold_on,
                      title_card_2048, Color::bold_off, Color::def);
 }
 
 std::string BoardInputPrompt() {
   constexpr auto sp = "  ";
+  // 注意：这里把一段长文本拆成两段（提示语 + 输入请求）拼到格式串里，
+  // 等价于旧实现中"先输出提示语（带换行）再输出 Enter Choice"的串行结构。
   return std::format("{}{}{}{}{}{}", Color::bold_on, sp,
                      "(NOTE: Scores and statistics will be saved only for the "
                      "4x4 gameboard)\n",
@@ -84,6 +123,9 @@ std::string InvalidInputGameBoardErrorPrompt() {
 
 std::string BoardSizeErrorPrompt() {
   constexpr auto sp = "  ";
+  // 旧写法使用 std::begin(invalid_prompt_text)[i] 来取数组元素，
+  // 新写法直接把字面量写在格式串里，更直观。注意：
+  //   {} 占位符数量必须 = 参数数量（编译期校验），这里 8 个 {} 对应 8 个参数。
   return std::format(
       "{}{}{}{}{}{}{}{}\n\n", Color::red, sp,
       "Invalid input. Gameboard size should range from ",
@@ -95,6 +137,8 @@ std::string BoardSizeErrorPrompt() {
 
 std::string InputCommandListPrompt() {
   constexpr auto sp = "  ";
+  // 旧写法：循环 6 次，每次 str_os << sp << txt << "\n"。
+  // 新写法：把 6 行拼成一个格式串，6 个 sp 占位（同样位置复用同一个变量）。
   return std::format("{}W or K or ↑ => Up\n{}A or H or ← => Left\n"
                      "{}S or J or ↓ => Down\n{}D or L or → => Right\n"
                      "{}Z or P => Save\n{}M => Return to menu\n",
@@ -108,6 +152,7 @@ std::string EndlessModeCommandListPrompt() {
 
 std::string InputCommandListFooterPrompt() {
   constexpr auto sp = "  ";
+  // 使用带索引的占位符 {0} 复用同一个 sp 参数（C++20 std::format 支持）。
   return std::format("{0} \n{0}Press the keys to start and continue.\n{0} \n\n", sp);
 }
 
@@ -153,6 +198,12 @@ std::string GameScoreBoardBox(scoreboard_display_data_t scdd) {
   const auto inner_padding_length =
       UI_SCOREBOARD_SIZE - (inner_border_padding.length() * 2);
 
+  // ---------------------------------------------------------------
+  //  重构：抽出 pad_right 闭包
+  //  旧代码在每行（SCORE / BEST SCORE / MOVES）都重复写一遍
+  //  `bold_on + 标签 + bold_off + 填充空格 + 数值` 这种格式。
+  //  抽成 lambda 后，三个分支共享一份格式逻辑，未来要改格式只改一处。
+  // ---------------------------------------------------------------
   const auto pad_right = [&](const std::string &label,
                              const std::string &value) {
     const auto pad_count = inner_padding_length - label.length() - value.length();
